@@ -48,7 +48,7 @@ function extractNumber(str) {
   // Перебираем строку посимвольно
   for (let i = 0; i < normalizedStr.length; i++) {
     const char = normalizedStr.at(i);
-    if (!Number.isNaN(parseInt(char))) {
+    if (!Number.isNaN(parseInt(char, 10))) {
       resultStr += char;
     }
   }
@@ -57,7 +57,7 @@ function extractNumber(str) {
     return NaN;
   }
 
-  return parseInt(resultStr);
+  return parseInt(resultStr, 10);
 }
 
 extractNumber('2023 год'); // 2023
