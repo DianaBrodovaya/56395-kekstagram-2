@@ -52,4 +52,5 @@ const createPhotoDescription = (id) => ({
 
 const photos = Array.from({length: PHOTOS_COUNT}, (_, index) => createPhotoDescription(index + 1));
 
+/* eslint-disable no-console */
 console.log(photos);
