@@ -1,4 +1,4 @@
 import { photoDescriptions } from './create-photo-descriptions.js';
+import { renderThumbnails } from './render-thumbnails.js';
 
-/* eslint-disable no-console */
-console.log(photoDescriptions);
+renderThumbnails(photoDescriptions);
