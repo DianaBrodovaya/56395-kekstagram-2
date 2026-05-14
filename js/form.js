@@ -1,3 +1,7 @@
+
+import { resetScale } from './scale.js';
+import { resetEffects } from './effects.js';
+
 const MAX_HASHTAGS_COUNT = 5;
 const MAX_COMMENT_LENGTH = 140;
 const HASHTAG_REGEX = /^#[a-zа-яё0-9]{1,19}$/i;
@@ -23,10 +27,11 @@ const closeUploadForm = () => {
   document.body.classList.remove('modal-open');
   uploadForm.reset();
   pristine.reset();
+  resetScale();
+  resetEffects();
   document.removeEventListener('keydown', onDocumentKeydown);
 };
 
-// Функция обработки нажатия Esc
 function onDocumentKeydown(evt) {
   if (evt.key === 'Escape' && !isTextFieldFocused()) {
     evt.preventDefault();
@@ -37,6 +42,8 @@ function onDocumentKeydown(evt) {
 const openUploadForm = () => {
   uploadOverlay.classList.remove('hidden');
   document.body.classList.add('modal-open');
+  resetScale();
+  resetEffects();
   document.addEventListener('keydown', onDocumentKeydown);
 };
 
