@@ -1,5 +1,12 @@
-import { photoDescriptions } from './photo-descriptions.js';
 import { renderThumbnails } from './thumbnails.js';
+import { getData } from './api.js';
+import { showDataError } from './utils.js';
 import './form.js';
 
-renderThumbnails(photoDescriptions);
+getData()
+  .then((photos) => {
+    renderThumbnails(photos);
+  })
+  .catch(() => {
+    showDataError();
+  });
