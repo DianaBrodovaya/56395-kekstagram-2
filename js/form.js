@@ -1,6 +1,7 @@
-
 import { resetScale } from './scale.js';
 import { resetEffects } from './effects.js';
+import { sendData } from './api.js';
+import { showSuccessMessage, showErrorMessage } from './utils.js';
 
 const MAX_HASHTAGS_COUNT = 5;
 const MAX_COMMENT_LENGTH = 140;
@@ -12,12 +13,28 @@ const uploadOverlay = uploadForm.querySelector('.img-upload__overlay');
 const cancelButton = uploadForm.querySelector('.img-upload__cancel');
 const hashtagInput = uploadForm.querySelector('.text__hashtags');
 const commentInput = uploadForm.querySelector('.text__description');
+const submitButton = uploadForm.querySelector('.img-upload__submit');
+
+const SubmitButtonText = {
+  IDLE: 'Опубликовать',
+  SENDING: 'Публикую...'
+};
 
 const pristine = new Pristine(uploadForm, {
   classTo: 'img-upload__field-wrapper',
   errorTextParent: 'img-upload__field-wrapper',
   errorTextClass: 'img-upload__field-wrapper--error',
 });
+
+const blockSubmitButton = () => {
+  submitButton.disabled = true;
+  submitButton.textContent = SubmitButtonText.SENDING;
+};
+
+const unblockSubmitButton = () => {
+  submitButton.disabled = false;
+  submitButton.textContent = SubmitButtonText.IDLE;
+};
 
 const isTextFieldFocused = () =>
   document.activeElement === hashtagInput || document.activeElement === commentInput;
@@ -33,7 +50,8 @@ const closeUploadForm = () => {
 };
 
 function onDocumentKeydown(evt) {
-  if (evt.key === 'Escape' && !isTextFieldFocused()) {
+  const isErrorMessageOpen = Boolean(document.querySelector('.error'));
+  if (evt.key === 'Escape' && !isTextFieldFocused() && !isErrorMessageOpen) {
     evt.preventDefault();
     closeUploadForm();
   }
@@ -93,8 +111,22 @@ uploadInput.addEventListener('change', openUploadForm);
 cancelButton.addEventListener('click', closeUploadForm);
 
 uploadForm.addEventListener('submit', (evt) => {
+  evt.preventDefault();
+
   const isValid = pristine.validate();
-  if (!isValid) {
-    evt.preventDefault();
+  if (isValid) {
+    blockSubmitButton();
+
+    sendData(new FormData(evt.target))
+      .then(() => {
+        closeUploadForm();
+        showSuccessMessage();
+      })
+      .catch(() => {
+        showErrorMessage();
+      })
+      .finally(() => {
+        unblockSubmitButton();
+      });
   }
 });
