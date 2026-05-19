@@ -57,4 +57,12 @@ const showMessage = (templateId, buttonClass) => {
 const showSuccessMessage = () => showMessage('#success', '.success__button');
 const showErrorMessage = () => showMessage('#error', '.error__button');
 
-export { getRandomNumber, showDataError, showSuccessMessage, showErrorMessage };
+function debounce (callback, timeoutDelay = 500) {
+  let timeoutId;
+  return (...rest) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => callback.apply(this, rest), timeoutDelay);
+  };
+}
+
+export { getRandomNumber, showDataError, showSuccessMessage, showErrorMessage, debounce };
