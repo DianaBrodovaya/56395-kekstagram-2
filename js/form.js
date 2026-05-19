@@ -1,14 +1,17 @@
 import { resetScale } from './scale.js';
 import { resetEffects } from './effects.js';
 import { sendData } from './api.js';
-import { showSuccessMessage, showErrorMessage } from './utils.js';
+import { showSuccessMessage, showErrorMessage, showDataError } from './utils.js';
 
 const MAX_HASHTAGS_COUNT = 5;
 const MAX_COMMENT_LENGTH = 140;
 const HASHTAG_REGEX = /^#[a-zа-яё0-9]{1,19}$/i;
+const FILE_TYPES = ['jpg', 'jpeg', 'png', 'gif'];
 
 const uploadForm = document.querySelector('.img-upload__form');
 const uploadInput = uploadForm.querySelector('.img-upload__input');
+const previewImage = uploadForm.querySelector('.img-upload__preview img');
+const effectsPreviews = uploadForm.querySelectorAll('.effects__preview');
 const uploadOverlay = uploadForm.querySelector('.img-upload__overlay');
 const cancelButton = uploadForm.querySelector('.img-upload__cancel');
 const hashtagInput = uploadForm.querySelector('.text__hashtags');
@@ -58,11 +61,30 @@ function onDocumentKeydown(evt) {
 }
 
 const openUploadForm = () => {
-  uploadOverlay.classList.remove('hidden');
-  document.body.classList.add('modal-open');
-  resetScale();
-  resetEffects();
-  document.addEventListener('keydown', onDocumentKeydown);
+  const file = uploadInput.files[0];
+
+  if (!file) {
+    return;
+  }
+
+  const fileName = file.name.toLowerCase();
+  const matches = FILE_TYPES.some((it) => fileName.endsWith(it));
+
+  if (matches) {
+    const fileUrl = URL.createObjectURL(file);
+    previewImage.src = fileUrl;
+    effectsPreviews.forEach((preview) => {
+      preview.style.backgroundImage = `url(${fileUrl})`;
+    });
+    uploadOverlay.classList.remove('hidden');
+    document.body.classList.add('modal-open');
+    resetScale();
+    resetEffects();
+    document.addEventListener('keydown', onDocumentKeydown);
+  } else {
+    uploadInput.value = '';
+    showDataError();
+  }
 };
 
 const parseHashtags = (value) => value.trim().toLowerCase().split(/\s+/).filter(Boolean);
@@ -116,7 +138,6 @@ uploadForm.addEventListener('submit', (evt) => {
   const isValid = pristine.validate();
   if (isValid) {
     blockSubmitButton();
-
     sendData(new FormData(evt.target))
       .then(() => {
         closeUploadForm();
